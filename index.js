@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -19,6 +20,16 @@ async function run() {
         await client.connect();
         const itemsCollection = client.db('AcStockHouse').collection('items');
 
+        // AUTH TOKEN
+        app.post('/getToken', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1d'
+            });
+            res.send({accessToken});
+        });
+
+        // items API
         app.get('/items', async (req, res) => {
             const query = {};
             const cursor = itemsCollection.find(query);
@@ -80,7 +91,7 @@ async function run() {
             const result = await itemsCollection.deleteOne(query);
             res.send(result);
         });
-        
+
     }
     finally{}
 }
