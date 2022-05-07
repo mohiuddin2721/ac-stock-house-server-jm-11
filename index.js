@@ -61,7 +61,18 @@ async function run() {
             }
             const result = await itemsCollection.updateOne(filter, updateDoc, options);
             res.send(result);
-        })
+        });
+
+        // My Item Collection API
+        app.get('/myItems', async (req, res) => {
+            const email = req.query.email;
+            // console.log(email);
+            const query = {email: email};
+            const cursor = itemsCollection.find(query);
+            const myItems = await cursor.toArray();
+            res.send(myItems);
+        });
+
     }
     finally{}
 }
